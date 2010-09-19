@@ -47,9 +47,8 @@ sub parser {
     my $name = $self->strip_name;
     die unless $name;
 
-    $self->inject_if_block('{ my $class = __PACKAGE__; no strict "refs"; *{"::$class"} = \{ setup => [], teardown => [] } }');
-    $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "teardown");');
-    $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "setup");');
+    $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "teardown", order => "post");');
+    $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "setup", order => "pre");');
     $self->inject_if_block('use Test::Mini::Unit::Sugar::Test;');
     $self->inject_if_block('use Test::Mini::Assertions;');
     $self->inject_if_block('use base "Test::Mini::TestCase";');
