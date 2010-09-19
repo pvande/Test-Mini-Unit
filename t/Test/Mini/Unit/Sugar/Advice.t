@@ -1,4 +1,4 @@
-use Test::More tests => 25;
+use Test::More tests => 20;
 
 BEGIN {
     require_ok Test::Mini::Unit::Sugar::Advice;
@@ -10,65 +10,107 @@ BEGIN {
 }
 
 {
-    note 'Testing top-level packages...';
+    note 'Testing pre-advice...';
     {
-        package Foo;
-        use Test::Mini::Unit::Sugar::Advice name => 'advice';
+        package Bar;
+        use Test::Mini::Unit::Sugar::Advice name => 'up', order => 'pre';
     }
 
-    can_ok Foo => 'advice';
+    can_ok Bar => 'up';
 
-    $Foo = { advice => [] };
+    my $up;
+
+    note '  Single declared advisement...';
+    {
+        package Foo;
+
+        sub up {
+            main::is($up, undef, 'existing advice is called first');
+            $up = 0;
+        }
+
+        use Test::Mini::Unit::Sugar::Advice name => 'up', order => 'pre';
+    }
 
     {
         package Foo;
-        advice { main::ok 1; return 0 }
+        up {
+            main::is($up, 0, 'declared advice is called next');
+            $up = 1;
+        }
     }
 
-    is scalar(@{$Foo->{advice}}), 1;
-    isa_ok $Foo->{advice}->[0], 'CODE';
-    is $Foo->{advice}->[0]->(), 0;
+    Foo->up();
+    main::is($up, 1);
 
+    $up = undef;
+
+    note '  Multiple advisements...';
     {
         package Foo;
-        advice { main::ok 1; return 1 }
+        up {
+            main::is($up, 1, 'subsequent advice is called afterwards');
+            $up = 2;
+        }
     }
 
-    is scalar(@{$Foo->{advice}}), 2;
-    isa_ok $Foo->{advice}->[1], 'CODE';
-    is $Foo->{advice}->[1]->(), 1;
+    Foo->up();
+    main::is $up, 2;
 }
 
 {
-    note 'Testing namespaced packages';
+    note 'Testing post-advice...';
     {
-        package Foo::Bar;
-        use Test::Mini::Unit::Sugar::Advice name => 'advice';
+        package Bar;
+        use Test::Mini::Unit::Sugar::Advice name => 'down', order => 'post';
     }
 
-    can_ok 'Foo::Bar' => 'advice';
+    can_ok Bar => 'down';
 
-    $Foo::Bar = { advice => [] };
+    my $down = 0;
 
+    note '  Single declared advisement...';
     {
-        package Foo::Bar;
-        advice { main::ok 1; return 0 }
+        package Foo;
+
+        my $counter = 1;
+        sub down {
+            main::is($down, 2, 'existing advice is called last');
+            $down = 3;
+        }
+
+        use Test::Mini::Unit::Sugar::Advice name => 'down', order => 'post';
     }
 
-    is scalar(@{$Foo::Bar->{advice}}), 1;
-    isa_ok $Foo::Bar->{advice}->[0], 'CODE';
-    is $Foo::Bar->{advice}->[0]->(), 0;
-
+    my $expect = 0;
     {
-        package Foo::Bar;
-        advice { main::ok 1; return 1 }
+        package Foo;
+
+        down {
+            main::is($down, $expect, 'declared advice is called before existing');
+            $down = 2;
+        }
     }
 
-    is scalar(@{$Foo::Bar->{advice}}), 2;
-    isa_ok $Foo::Bar->{advice}->[1], 'CODE';
-    is $Foo::Bar->{advice}->[1]->(), 1;
+    Foo->down();
+    main::is($down, 3);
+
+    ($down, $expect) = (undef, 1);
+
+    note '  Multiple advisements...';
+    {
+        package Foo;
+        down {
+            main::is($down, undef, 'subsequent advice is called first');
+            $down = 1;
+        }
+    }
+
+    Foo->down();
+    main::is($down, 3);
 }
 
+note "Testing 'into' flag...";
 {
     package Y;
     use Test::Mini::Unit::Sugar::Advice into => 'X', name => 'advice';
@@ -76,16 +118,5 @@ BEGIN {
 
 ok ! Y->can('advice');
 can_ok X => 'advice';
-
-$X = { advice => [ ] };
-
-{
-    package X;
-    advice { pass; return 0 }
-}
-
-is length(@{$X->{advice}}), 1;
-isa_ok $X->{advice}->[0], 'CODE';
-is $X->{advice}->[0]->(), 0;
 
 1;

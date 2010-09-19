@@ -11,18 +11,23 @@ sub import {
     my ($class, %args) = @_;
     die 'Test::Mini::Unit::Sugar::Advice requires a name argument!' unless $args{name};
 
+    my $ctx = $class->new();
     my $caller = $args{into} || caller;
+
+    $ctx->{order}  = $args{order};
+    $ctx->{advice} = [ $caller->can($args{name}) || ( ) ];
 
     {
         no strict 'refs';
+        no warnings;
+
         *{"$caller\::$args{name}"} = sub (&) {};
+
         on_scope_end {
-            no warnings;
-            *{"$caller\::$args{name}"} = \&{"Test::Mini::TestCase::$args{name}"};
+            *{"$caller\::$args{name}"} = sub { $_->(@_) for @{$ctx->{advice}} };
         }
     }
 
-    my $ctx = $class->new();
     Devel::Declare->setup_for(
         $caller => { $args{name} => { const => sub { $ctx->parser(@_) } } }
     );
@@ -37,23 +42,19 @@ sub parser {
     $self->inject_if_block($self->scope_injector_call());
     $self->inject_if_block('my $self = shift;');
 
-    $self->install($self->{Declarator});
+    $self->install();
 }
 
 sub install {
-    my ($self, $name) = @_;
-    $self->shadow($self->code_for($name));
-}
-
-sub code_for {
-    my ($self, $name) = @_;
-
-    my $pkg = $self->get_curstash_name;
-    return sub (&) {
-        my $code = shift;
-        no strict 'refs';
-        push @{${"::$pkg"}->{$name}}, $code;
-    };
+    my ($self) = @_;
+    $self->shadow(sub (&) {
+        if ($self->{order} eq 'pre') {
+            push @{$self->{advice}}, @_;
+        }
+        elsif ($self->{order} eq 'post') {
+            unshift @{$self->{advice}}, @_;
+        }
+    });
 }
 
 1;
