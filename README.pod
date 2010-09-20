@@ -13,7 +13,7 @@ very little overhead verbosity, the overhead of creating a new class --
 or set of classes -- in Perl can still be a bit more distracting than
 you'd really like.
 
-<h1>Enter Test::Mini::Unit</h1>
+=head2 Enter Test::Mini::Unit
 
 At first glance, Test::Mini::Unit provides moderate improvements over
 the traditional style, transforming this:
