@@ -11,11 +11,8 @@ sub import {
     my ($class, %args) = @_;
     die 'Test::Mini::Unit::Sugar::Advice requires a name argument!' unless $args{name};
 
-    my $ctx = $class->new();
     my $caller = $args{into} || caller;
-
-    $ctx->{order}  = $args{order};
-    $ctx->{advice} = [ $caller->can($args{name}) || ( ) ];
+    my $ctx = $class->new(%args, advice => [ $caller->can($args{name}) || () ]);
 
     {
         no strict 'refs';
@@ -39,22 +36,17 @@ sub parser {
 
     $self->skip_declarator;
 
-    $self->inject_if_block($self->scope_injector_call());
-    $self->inject_if_block('my $self = shift;');
+    $self->inject_if_block($_) for reverse (
+        $self->scope_injector_call(),
+        'my $self = shift;',
+    );
 
-    $self->install();
-}
-
-sub install {
-    my ($self) = @_;
-    $self->shadow(sub (&) {
-        if ($self->{order} eq 'pre') {
-            push @{$self->{advice}}, @_;
-        }
-        elsif ($self->{order} eq 'post') {
-            unshift @{$self->{advice}}, @_;
-        }
-    });
+    if ($self->{order} eq 'pre') {
+        $self->shadow(sub (&) { push @{$self->{advice}}, @_ });
+    }
+    elsif ($self->{order} eq 'post') {
+        $self->shadow(sub (&) { unshift @{$self->{advice}}, @_ });
+    }
 }
 
 1;
