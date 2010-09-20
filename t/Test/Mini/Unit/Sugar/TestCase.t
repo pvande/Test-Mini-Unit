@@ -1,4 +1,4 @@
-use Test::More tests => 34;
+use Test::More tests => 70;
 use strict;
 use warnings;
 
@@ -17,7 +17,7 @@ is(__PACKAGE__, 'main');
 case TestCase {
     main::is(__PACKAGE__, 'TestCase');
     main::isa_ok(__PACKAGE__, 'Test::Mini::TestCase');
-    main::can_ok(__PACKAGE__, qw/ test setup teardown /);
+    main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
 
     our $setup_calls = 0;
     our $test_calls  = 0;
@@ -68,6 +68,66 @@ case TestCase {
         main::note 'second #teardown called for ' . $self->{name};
         main::is $test_calls, 2, 'second #teardown called before first';
         $test_calls--;
+    }
+
+    case Inner {
+        main::is(__PACKAGE__, 'TestCase::Inner');
+        main::isa_ok(__PACKAGE__, 'TestCase');
+        main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
+
+        setup {
+            main::isa_ok $self, __PACKAGE__;
+            main::note 'inner #setup called for ' . $self->{name};
+            main::is $TestCase::setup_calls, 2, 'inner #setup called third';
+            $TestCase::setup_calls++;
+        }
+
+        test in_nested_scope {
+            main::note 'test_in_nested_scope called';
+            main::isa_ok $self, __PACKAGE__;
+            main::is $TestCase::setup_calls, 3;
+            main::is $TestCase::test_calls, 0;
+
+            $TestCase::setup_calls -= 3;
+            $TestCase::test_calls += 3;
+        }
+
+        teardown {
+            main::isa_ok $self, __PACKAGE__;
+            main::note 'inner #teardown called for ' . $self->{name};
+            main::is $TestCase::test_calls, 3, 'inner #teardown called before others';
+            $TestCase::test_calls--;
+        }
+    }
+
+    case Qualified::Inner {
+        main::is(__PACKAGE__, 'Qualified::Inner');
+        main::isa_ok(__PACKAGE__, 'TestCase');
+        main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
+
+        setup {
+            main::isa_ok $self, __PACKAGE__;
+            main::note 'inner #setup called for ' . $self->{name};
+            main::is $TestCase::setup_calls, 2, 'inner #setup called third';
+            $TestCase::setup_calls++;
+        }
+
+        test in_nested_scope {
+            main::note 'test_in_nested_scope called';
+            main::isa_ok $self, __PACKAGE__;
+            main::is $TestCase::setup_calls, 3;
+            main::is $TestCase::test_calls, 0;
+
+            $TestCase::setup_calls -= 3;
+            $TestCase::test_calls += 3;
+        }
+
+        teardown {
+            main::isa_ok $self, __PACKAGE__;
+            main::note 'inner #teardown called for ' . $self->{name};
+            main::is $TestCase::test_calls, 3, 'inner #teardown called before others';
+            $TestCase::test_calls--;
+        }
     }
 
     END { main::is $TestCase::test_calls, 0 }

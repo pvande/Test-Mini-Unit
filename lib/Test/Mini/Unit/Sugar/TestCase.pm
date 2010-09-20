@@ -52,6 +52,7 @@ sub parser {
         'sub setup    { shift->SUPER::setup(@_)    }',
         'sub teardown { shift->SUPER::teardown(@_) }',
 
+        "use ${Sugar}::TestCase;",
         "use ${Sugar}::Test;",
         "use ${Sugar}::Advice (name => 'setup',    order => 'pre');",
         "use ${Sugar}::Advice (name => 'teardown', order => 'post');",
