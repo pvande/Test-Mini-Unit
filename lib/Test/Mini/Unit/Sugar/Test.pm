@@ -15,9 +15,8 @@ sub import {
         *{"$caller\::test"} = sub (&) {};
     }
 
-    my $ctx = $class->new();
     Devel::Declare->setup_for(
-        $caller => { test => { const => sub { $ctx->parser(@_) } } }
+        $caller => { test => { const => sub { $class->new()->parser(@_) } } }
     );
 }
 
@@ -28,27 +27,23 @@ sub parser {
     $self->skip_declarator;
     my $name = $self->strip_name;
 
-    $self->inject_if_block($self->scope_injector_call());
-    $self->inject_if_block('my $self = shift;');
+    $self->inject_if_block($_) for reverse (
+        $self->scope_injector_call(),
+        'my $self = shift;',
+    );
 
-    $self->install("test_$name");
+    $self->shadow($self->code("test_$name"));
 }
 
-sub install {
-    my ($self, $name) = @_;
-    $self->shadow($self->code_for($name));
-}
-
-sub code_for {
+sub code {
     my ($self, $name) = @_;
 
     my $pkg = $self->get_curstash_name;
     $name = join('::', $pkg, $name) unless ($name =~ /::/);
 
     return sub (&) {
-        my $code = shift;
         no strict 'refs';
-        *{$name} = subname $name => $code;
+        *{$name} = subname $name => shift;
     };
 }
 
