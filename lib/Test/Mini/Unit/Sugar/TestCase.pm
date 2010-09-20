@@ -12,12 +12,11 @@ sub import {
 
     {
         no strict 'refs';
-        *{"$caller\::testcase"} = sub (&) {};
+        *{"$caller\::case"} = sub (&) {};
     }
 
-    my $ctx = $class->new();
     Devel::Declare->setup_for(
-        $caller => { testcase => { const => sub { $ctx->parser(@_) } } }
+        $caller => { case => { const => sub { $class->new()->parser(@_) } } }
     );
 }
 

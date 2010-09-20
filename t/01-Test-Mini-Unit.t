@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::Mini::Unit;
-can_ok __PACKAGE__, 'testcase';
+can_ok __PACKAGE__, 'case';
 
 BEGIN {
     use_ok 'Test::Mini::Unit';

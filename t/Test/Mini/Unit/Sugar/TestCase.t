@@ -7,14 +7,14 @@ BEGIN {
     Test::Mini::Unit::Sugar::TestCase->import();
 }
 
-can_ok __PACKAGE__, 'testcase';
+can_ok __PACKAGE__, 'case';
 ok !__PACKAGE__->can('test');
 ok !__PACKAGE__->can('setup');
 ok !__PACKAGE__->can('teardown');
 
 is(__PACKAGE__, 'main');
 
-testcase TestCase {
+case TestCase {
     main::is(__PACKAGE__, 'TestCase');
     main::isa_ok(__PACKAGE__, 'Test::Mini::TestCase');
     main::can_ok(__PACKAGE__, qw/ test setup teardown /);
