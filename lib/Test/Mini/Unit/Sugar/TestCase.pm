@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Devel::Declare ();
-use Sub::Name;
 
 sub import {
     my ($class, %args) = @_;
@@ -20,41 +19,45 @@ sub import {
     );
 }
 
-sub code_for {
-    my ($self, $name) = @_;
-
-    my $pkg = $self->get_curstash_name;
-    $name = join('::', $pkg, $name) unless ($name =~ /::/);
-    return sub (&) {
-        my $code = shift;
-        no strict 'refs';
-        *{$name} = subname $name => $code;
-        return $code->();
-    };
-}
-
-sub install {
-    my ($self, $name ) = @_;
-    $self->shadow($self->code_for($name));
-}
-
 sub parser {
     my $self = shift;
     $self->init(@_);
 
     $self->skip_declarator;
+
     my $name = $self->strip_name;
     die unless $name;
 
-    $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "teardown", order => "post");');
-    $self->inject_if_block('use Test::Mini::Unit::Sugar::Advice (name => "setup", order => "pre");');
-    $self->inject_if_block('use Test::Mini::Unit::Sugar::Test;');
-    $self->inject_if_block('use Test::Mini::Assertions;');
-    $self->inject_if_block('use base "Test::Mini::TestCase";');
-    $self->inject_if_block("package $name;");
-    $self->inject_if_block($self->scope_injector_call());
+    my $pkg  = $self->get_curstash_name;
+    my $base = $pkg;
 
-    $self->install($name);
+    # If our current scope isn't a Test::Mini::TestCase, we inherit from that;
+    # otherwise, we inherit from our current scope.
+    $base = 'Test::Mini::TestCase' unless $base->isa('Test::Mini::TestCase');
+
+    # Nested packages should be namespaced under their parent, unless the
+    # package name is qualified or they're in the top level.
+    $name = join('::', $pkg, $name) unless $name =~ /::/ || $pkg eq 'main';
+
+    my $Sugar = 'Test::Mini::Unit::Sugar';
+
+    $self->inject_if_block($_) for reverse (
+        $self->scope_injector_call(),
+
+        "package $name;",
+        "use base '$base';",
+        "use Test::Mini::Assertions;",
+
+        # Provide explicit default advice to avoid some order-specific issues.
+        'sub setup    { shift->SUPER::setup(@_)    }',
+        'sub teardown { shift->SUPER::teardown(@_) }',
+
+        "use ${Sugar}::Test;",
+        "use ${Sugar}::Advice (name => 'setup',    order => 'pre');",
+        "use ${Sugar}::Advice (name => 'teardown', order => 'post');",
+    );
+
+    $self->shadow(sub (&) { shift->(); 1; });
 }
 
 1;
