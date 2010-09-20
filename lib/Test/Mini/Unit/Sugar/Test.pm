@@ -1,3 +1,5 @@
+# Defines the behavior of the +test+ keyword.
+# @api private
 package Test::Mini::Unit::Sugar::Test;
 use base 'Devel::Declare::Context::Simple';
 use strict;

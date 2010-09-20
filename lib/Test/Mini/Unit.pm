@@ -1,3 +1,109 @@
+# Declarative Sugar for Test::Mini.
+#
+# Test::Mini::Unit aims to provide a simpler, boilerplate-free environment for
+# writing new {Test::Mini} test cases.  While Test::Mini itself is a fairly
+# reasonable environment with very little overhead verbosity, the overhead of
+# creating a new class -- or set of classes -- in Perl can still be a bit more
+# distracting than you'd really like.
+#
+# = Enter Test::Mini::Unit
+#
+# At first glance, Test::Mini::Unit provides moderate improvements over the
+# traditional style, transforming this:
+#
+#   package t::Test
+#   use base 'Test::Mini::TestCase';
+#   use strict;
+#   use warnings;
+#
+#   use Test::Mini::Assertions;
+#
+#   sub setup {
+#       # do something
+#   }
+#
+#   sub test_some_code {
+#       assert($something_true);
+#   }
+#
+#   sub teardown {
+#       # undo something
+#   }
+#
+#   1;
+#
+# Into this:
+#
+#   use Test::Mini::Unit;
+#
+#   case t::Test {
+#       setup {
+#           # do something
+#       }
+#
+#       test some_code {
+#           assert($something_true);
+#       }
+#
+#       teardown {
+#           # undo something
+#       }
+#   }
+#
+# But Test::Mini::Unit really begins to shine as your test cases take on more
+# complexity.  Multiple calls to the test advice methods (+setup+ and
+# +teardown+) will stack like +BEGIN+ and +END+ blocks, allowing you to
+# co-locate tests and relevant advice.
+#
+#   # Traditional
+#   sub setup {
+#       # do a bunch of setup for test_one
+#       # ...
+#       # do a bunch of setup for test_two
+#       # ...
+#   }
+#
+#   sub test_one { ... }
+#   sub test_two { ... }
+#
+#   # Test::Mini::Unit
+#   setup { "do setup for test_one" }
+#   sub test_one { ... }
+#
+#   setup { "do setup for test_two" }
+#   sub test_two { ... }
+#
+# Per-test local storage is automatically available as +$self+ from all advice
+# and test blocks.
+#
+#    setup { $self->{data} = Package->new() }
+#    test data { assert_isa($self->{data}, 'Package') }
+#
+#    teardown { unlink $self->{tmpfile} }
+#
+# And perhaps most usefully, test cases can be *nested*.  Nested test cases
+# inherit all their outer scope's test advice, allowing you to build richer
+# tests with far less code.
+#
+#   case t::IO::Scalar {
+#       setup { $self->{buffer} = IO::Scalar->new() }
+#       test can_read  { assert_can($self->{buffer}, 'read')  }
+#       test can_write { assert_can($self->{buffer}, 'write') }
+#       test is_empty  { assert_empty("@{[$self->{buffer}]}") }
+#
+#       case AfterWritingString {
+#           setup { $self->{buffer}->print('String!') }
+#           test contents { assert_equal("@{[$self->{buffer}]}", 'String!') }
+#       }
+#
+#       case AfterWritingObject {
+#           setup { $self->{buffer}->print($self) }
+#           test contents { assert_equal("@{[$self->{buffer}]}", "$self") }
+#       }
+#   }
+#
+# @see Test::Mini
+# @author Pieter van de Bruggen <pvande@cpan.org>
 package Test::Mini::Unit;
 use strict;
 use warnings;

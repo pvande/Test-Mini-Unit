@@ -1,3 +1,5 @@
+# Defines the behavior of the test advice keywords (+setup+ and +teardown+).
+# @api private
 package Test::Mini::Unit::Sugar::Advice;
 use base 'Devel::Declare::Context::Simple';
 use strict;

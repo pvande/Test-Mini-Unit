@@ -1,3 +1,5 @@
+# Defines the behavior of the +case+ keyword.
+# @api private
 package Test::Mini::Unit::Sugar::TestCase;
 use base 'Devel::Declare::Context::Simple';
 use strict;
