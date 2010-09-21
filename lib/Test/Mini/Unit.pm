@@ -93,12 +93,16 @@
 #
 #       case AfterWritingString {
 #           setup { $self->{buffer}->print('String!') }
-#           test contents { assert_equal("@{[$self->{buffer}]}", 'String!') }
+#           test contents {
+#               assert_equal("@{[$self->{buffer}]}", 'String!');
+#           }
 #       }
 #
 #       case AfterWritingObject {
 #           setup { $self->{buffer}->print($self) }
-#           test contents { assert_equal("@{[$self->{buffer}]}", "$self") }
+#           test contents {
+#               assert_equal("@{[$self->{buffer}]}", "$self");
+#           }
 #       }
 #   }
 #

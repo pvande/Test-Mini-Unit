@@ -144,7 +144,7 @@ END {
 }
 
 BEGIN {
-    # This is a work-aroudn for the fact that requiring Test::Mini::TestCase
+    # This is a work-around for the fact that requiring Test::Mini::TestCase
     # wll automatically set up a runner, which we don't want right now.
     use Test::Mini;
     use List::Util qw/ first /;
