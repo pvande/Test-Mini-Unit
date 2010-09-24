@@ -140,7 +140,8 @@ Test::Mini::Runner->new(logger => 'Test::Mini::Logger')->run();
 END {
     # Cleanup, so that others aren't polluted if run in the same process.
     @TestCase::ISA = ();
-    @Test::Case::ISA = ();
+    @TestCase::Inner::ISA = ();
+    @Qualified::Inner::ISA = ();
 }
 
 BEGIN {
