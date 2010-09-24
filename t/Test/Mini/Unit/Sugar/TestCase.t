@@ -1,4 +1,4 @@
-use Test::More tests => 70;
+use Test::More tests => 90;
 use strict;
 use warnings;
 
@@ -18,6 +18,8 @@ case TestCase {
     main::is(__PACKAGE__, 'TestCase');
     main::isa_ok(__PACKAGE__, 'Test::Mini::TestCase');
     main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
+    main::ok(!__PACKAGE__->can('assert_existence'));
+    main::ok(!__PACKAGE__->can('assert_nonexistence'));
 
     our $setup_calls = 0;
     our $test_calls  = 0;
@@ -74,6 +76,8 @@ case TestCase {
         main::is(__PACKAGE__, 'TestCase::Inner');
         main::isa_ok(__PACKAGE__, 'TestCase');
         main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
+        main::ok(!__PACKAGE__->can('assert_existence'));
+        main::ok(!__PACKAGE__->can('assert_nonexistence'));
 
         setup {
             main::isa_ok $self, __PACKAGE__;
@@ -104,6 +108,8 @@ case TestCase {
         main::is(__PACKAGE__, 'Qualified::Inner');
         main::isa_ok(__PACKAGE__, 'TestCase');
         main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
+        main::ok(!__PACKAGE__->can('assert_existence'));
+        main::ok(!__PACKAGE__->can('assert_nonexistence'));
 
         setup {
             main::isa_ok $self, __PACKAGE__;
@@ -137,11 +143,74 @@ is(__PACKAGE__, 'main');
 use Test::Mini::Runner;
 Test::Mini::Runner->new(logger => 'Test::Mini::Logger')->run();
 
+note "Testing behavior of the 'with' option as an array...";
+
+{
+    package ExistenceAssertions;
+    BEGIN { $INC{'ExistenceAssertions.pm'} = __FILE__; }
+
+    sub import {
+        no strict 'refs';
+        my $caller = caller;
+
+        main::ok $caller =~ /^TestCaseWithArray/;
+
+        *{"$caller\::assert_existence"} = sub { };
+    }
+}
+
+use Test::Mini::Unit::Sugar::TestCase with => [ 'ExistenceAssertions' ];
+
+case TestCaseWithArray {
+    main::is(__PACKAGE__, 'TestCaseWithArray');
+    main::isa_ok(__PACKAGE__, 'Test::Mini::TestCase');
+    main::can_ok(__PACKAGE__, qw/ case test setup teardown assert assert_existence /);
+
+    case Inner {
+        main::is(__PACKAGE__, 'TestCaseWithArray::Inner');
+        main::isa_ok(__PACKAGE__, 'TestCaseWithArray');
+        main::can_ok(__PACKAGE__, qw/ case test setup teardown assert assert_existence /);
+    }
+}
+
+{
+    package NonexistenceAssertions;
+    BEGIN { $INC{'NonexistenceAssertions.pm'} = __FILE__; }
+
+    sub import {
+        no strict 'refs';
+        my $caller = caller;
+
+        main::ok $caller =~ /^TestCaseWithString/;
+
+        *{"$caller\::assert_nonexistence"} = sub { };
+    }
+}
+
+note "Testing behavior of the 'with' option as a string...";
+
+use Test::Mini::Unit::Sugar::TestCase with => 'NonexistenceAssertions';
+
+case TestCaseWithString {
+    main::is(__PACKAGE__, 'TestCaseWithString');
+    main::isa_ok(__PACKAGE__, 'Test::Mini::TestCase');
+    main::can_ok(__PACKAGE__, qw/ case test setup teardown assert assert_nonexistence /);
+
+    case Inner {
+        main::is(__PACKAGE__, 'TestCaseWithString::Inner');
+        main::isa_ok(__PACKAGE__, 'TestCaseWithString');
+        main::can_ok(__PACKAGE__, qw/ case test setup teardown assert assert_nonexistence /);
+    }
+}
+
+
 END {
     # Cleanup, so that others aren't polluted if run in the same process.
     @TestCase::ISA = ();
     @TestCase::Inner::ISA = ();
     @Qualified::Inner::ISA = ();
+    @TestCaseWithArray::ISA = ();
+    @TestCaseWithArray::Inner::ISA = ();
 }
 
 BEGIN {

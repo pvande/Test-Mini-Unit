@@ -106,6 +106,19 @@
 #       }
 #   }
 #
+# To automatically use packages inside all your test cases (for example, your
+# own custom assertions), simply pass the 'with' option to Test::Mini::Unit;
+# it can handle either a single package name or an array.
+#
+#   use Test::Mini::Unit (with => [ My::Assertions, My::HelperFuncs ]);
+#
+#   case t::TestCase {
+#       # My::Assertions and My::HelperFuncs are already imported here.
+#       case Nested {
+#           # In here, too.
+#       }
+#   }
+#
 # @see Test::Mini
 # @author Pieter van de Bruggen <pvande@cpan.org>
 package Test::Mini::Unit;

@@ -17,7 +17,9 @@ sub import {
     }
 
     Devel::Declare->setup_for(
-        $caller => { case => { const => sub { $class->new()->parser(@_) } } }
+        $caller => { case => { const => sub {
+            $class->new(%args)->parser(@_);
+        } } }
     );
 }
 
@@ -42,6 +44,7 @@ sub parser {
     $name = join('::', $pkg, $name) unless $name =~ /::/ || $pkg eq 'main';
 
     my $Sugar = 'Test::Mini::Unit::Sugar';
+    my @with = ref $self->{with} ? @{$self->{with}} : $self->{with} || ();
 
     $self->inject_if_block($_) for reverse (
         $self->scope_injector_call(),
@@ -58,6 +61,7 @@ sub parser {
         "use ${Sugar}::Test;",
         "use ${Sugar}::Advice (name => 'setup',    order => 'pre');",
         "use ${Sugar}::Advice (name => 'teardown', order => 'post');",
+        (map { "use $_;" } reverse @with),
     );
 
     $self->shadow(sub (&) { shift->(); 1; });
