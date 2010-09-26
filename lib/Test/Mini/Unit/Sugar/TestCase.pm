@@ -41,7 +41,7 @@ sub parser {
 
     # Nested packages should be namespaced under their parent, unless the
     # package name is qualified or they're in the top level.
-    $name = join('::', $pkg, $name) unless $name =~ /::/ || $pkg eq 'main';
+    $name = join('::', $pkg, $name) unless $name =~ s/^::// || $pkg eq 'main';
 
     my $Sugar = 'Test::Mini::Unit::Sugar';
     my @with = ref $self->{with} ? @{$self->{with}} : $self->{with} || ();

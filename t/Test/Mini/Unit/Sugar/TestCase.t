@@ -104,7 +104,7 @@ case TestCase {
         }
     }
 
-    case Qualified::Inner {
+    case ::Qualified::Inner {
         main::is(__PACKAGE__, 'Qualified::Inner');
         main::isa_ok(__PACKAGE__, 'TestCase');
         main::can_ok(__PACKAGE__, qw/ case test setup teardown assert /);
