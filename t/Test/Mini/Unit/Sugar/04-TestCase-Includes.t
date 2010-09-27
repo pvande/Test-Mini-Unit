@@ -16,7 +16,7 @@
 use Test::Mini::Unit
     with => 'ExtraAssertions';
 
-case TestWithSingle {
+case t::Test::Mini::Unit::Sugar::TestCase::Includes::WithSingle {
     test it {
         assert_not_appearing_in_the_standard_assertions();
     }
@@ -32,7 +32,7 @@ case TestWithSingle {
 use Test::Mini::Unit
     with => [ 'ExtraAssertions' ];
 
-case TestWithList {
+case t::Test::Mini::Unit::Sugar::TestCase::Includes::WithArray {
     test it {
         assert_not_appearing_in_the_standard_assertions();
     }

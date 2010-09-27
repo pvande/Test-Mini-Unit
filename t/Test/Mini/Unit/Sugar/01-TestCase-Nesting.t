@@ -61,7 +61,7 @@ case Top {
 
 # Begin actual tests
 ####################
-package t::Test::Mini::Logger::TAP;
+package t::Test::Mini::Unit::Sugar::TestCase::Nesting;
 use base 'Test::Mini::TestCase';
 
 use Test::Mini::Assertions;

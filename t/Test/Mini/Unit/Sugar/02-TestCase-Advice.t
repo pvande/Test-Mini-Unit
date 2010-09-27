@@ -35,7 +35,7 @@ case Top {
 
 # Begin actual tests
 ####################
-package t::Test::Mini::Logger::TAP;
+package t::Test::Mini::Unit::Sugar::TestCase::Advice;
 use base 'Test::Mini::TestCase';
 
 use Test::Mini::Assertions;
