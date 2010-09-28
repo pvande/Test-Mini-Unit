@@ -28,7 +28,6 @@ my %WriteMakefileArgs = (
         'Sub::Name'      => '0.05',
     },
     'BUILD_REQUIRES' => {
-        'Test::More' => '0.96',
         'B'          => '0',
     },
     'CONFIGURE_REQUIRES' => {

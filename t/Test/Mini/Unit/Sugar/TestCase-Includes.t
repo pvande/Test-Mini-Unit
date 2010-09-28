@@ -28,6 +28,7 @@ case t::Test::Mini::Unit::Sugar::TestCase::Includes::WithSingle {
     }
 }
 
+undef $::{case};
 
 use Test::Mini::Unit
     with => [ 'ExtraAssertions' ];
