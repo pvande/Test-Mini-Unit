@@ -14,7 +14,7 @@ sub import {
     die 'Test::Mini::Unit::Sugar::Advice requires a name argument!' unless $args{name};
 
     my $caller = $args{into} || caller;
-    my $ctx = $class->new(%args, advice => [ $caller->can($args{name}) ]);
+    my $ctx = $class->new(%args, advice => [ $caller->can($args{name}) || () ]);
 
     {
         no strict 'refs';
