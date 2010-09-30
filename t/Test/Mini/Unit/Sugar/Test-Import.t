@@ -1,28 +1,20 @@
 use Test::Mini::Unit;
 
 {
-    package ImportTest;
-    use Test::Mini::Unit::Sugar::Test;
-    
-    test everything { return 42 }
-    test self       { return $self }
-}
-
-{
     package X;
 
     package Y;
     use Test::Mini::Unit::Sugar::Test into => 'X';
 }
 
-case t::Test::Mini::Unit::Sugar::Test::Import {
-    test keyword_creates_new_method {
-        assert_can(ImportTest => 'test_everything');
-        assert_equal(ImportTest->test_everything(), 42);
-    }
+{
+    package Z;
+    use Test::Mini::Unit::Sugar::Test;
+}
 
-    test methods_automatically_assign_self_variable {
-        assert_equal(ImportTest::test_self('FIRST') => 'FIRST');
+case t::Test::Mini::Unit::Sugar::Test::Import {
+    test imports_keyword_into_class {
+        assert_can(Z => 'test');
     }
 
     test into_option_imports_keyword_into_specified_class {
