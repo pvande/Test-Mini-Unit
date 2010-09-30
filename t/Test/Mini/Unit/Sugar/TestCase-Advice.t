@@ -4,31 +4,31 @@ use Test::Mini::Unit;
 our @calls = ();
 
 case Top {
-    setup { push @::calls, [ __PACKAGE__, 'first setup' ] }
-    setup { push @::calls, [ __PACKAGE__, 'second setup' ] }
+    setup { push @calls, [ __PACKAGE__, 'first setup' ] }
+    setup { push @calls, [ __PACKAGE__, 'second setup' ] }
 
-    test it { push @::calls, [ __PACKAGE__, 'test' ]; skip('Fixture') }
+    test it { push @calls, [ __PACKAGE__, 'test' ]; skip('Fixture') }
 
-    teardown { push @::calls, [ __PACKAGE__, 'first teardown' ] }
-    teardown { push @::calls, [ __PACKAGE__, 'second teardown' ] }
+    teardown { push @calls, [ __PACKAGE__, 'first teardown' ] }
+    teardown { push @calls, [ __PACKAGE__, 'second teardown' ] }
 
     case Nested {
-        setup { push @::calls, [ __PACKAGE__, 'first setup' ] }
-        setup { push @::calls, [ __PACKAGE__, 'second setup' ] }
+        setup { push @calls, [ __PACKAGE__, 'first setup' ] }
+        setup { push @calls, [ __PACKAGE__, 'second setup' ] }
 
-        test it { push @::calls, [ __PACKAGE__, 'test' ]; skip('Fixture') }
+        test it { push @calls, [ __PACKAGE__, 'test' ]; skip('Fixture') }
 
-        teardown { push @::calls, [ __PACKAGE__, 'first teardown' ] }
-        teardown { push @::calls, [ __PACKAGE__, 'second teardown' ] }
+        teardown { push @calls, [ __PACKAGE__, 'first teardown' ] }
+        teardown { push @calls, [ __PACKAGE__, 'second teardown' ] }
 
         case Deeply {
-            setup { push @::calls, [ __PACKAGE__, 'first setup' ] }
-            setup { push @::calls, [ __PACKAGE__, 'second setup' ] }
+            setup { push @calls, [ __PACKAGE__, 'first setup' ] }
+            setup { push @calls, [ __PACKAGE__, 'second setup' ] }
 
-            test it { push @::calls, [ __PACKAGE__, 'test' ]; skip('Fixture') }
+            test it { push @calls, [ __PACKAGE__, 'test' ]; skip('Fixture') }
 
-            teardown { push @::calls, [ __PACKAGE__, 'first teardown' ] }
-            teardown { push @::calls, [ __PACKAGE__, 'second teardown' ] }
+            teardown { push @calls, [ __PACKAGE__, 'first teardown' ] }
+            teardown { push @calls, [ __PACKAGE__, 'second teardown' ] }
         }
     }
 }
@@ -43,9 +43,9 @@ use Test::Mini::Assertions;
 sub assert_calls {
     my ($pkg, $expectations) = @_;
     no strict 'refs';
-    @::calls = ();
+    @calls = ();
     $pkg->new(name => 'test_it')->run(Test::Mini::Logger->new());
-    assert_equal(\@::calls, $expectations);
+    assert_equal(\@calls, $expectations);
 }
 
 sub test_top_level_cases {
