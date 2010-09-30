@@ -75,7 +75,7 @@ use Test::Mini::Unit;
     reuse ::D;
 }
 
-case t::Test::Mini::Unit::Sugar::Reuse::Calls {
+case t::Test::Mini::Unit::Sugar::Reuse::Behavior {
     test deeply_nested_package_includes_as_expected {
         assert_equal(
             \@Deeply::Nested::Package::used,
