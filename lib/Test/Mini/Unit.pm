@@ -50,6 +50,8 @@
 #       }
 #   }
 #
+# = Advice
+#
 # But Test::Mini::Unit really begins to shine as your test cases take on more
 # complexity.  Multiple calls to the test advice methods (+setup+ and
 # +teardown+) will stack like +BEGIN+ and +END+ blocks, allowing you to
@@ -73,6 +75,8 @@
 #   setup { "do setup for test_two" }
 #   sub test_two { ... }
 #
+# = Test-Local Storage
+#
 # Per-test local storage is automatically available as +$self+ from all advice
 # and test blocks.
 #
@@ -80,6 +84,8 @@
 #    test data { assert_isa($self->{data}, 'Package') }
 #
 #    teardown { unlink $self->{tmpfile} }
+#
+# = Nesting
 #
 # And perhaps most usefully, test cases can be *nested*.  Nested test cases
 # inherit all their outer scope's test advice, allowing you to build richer
@@ -106,9 +112,68 @@
 #       }
 #   }
 #
+# = Sharing Tests...
+#
+# In some cases, you may find it useful to reuse the same tests in different
+# cases.  For this purpose, the +shared+ and +reuse+ keywords exist:
+#
+#   shared BasicBookTests {
+#       test has_pages { ... }
+#       test pages_have_text { ... }
+#   }
+#
+#   case Book {
+#       reuse BasicBookTests;
+#   }
+#
+#   case LargePrintBook {
+#       reuse BasicBookTests;
+#       test words_should_be_big { ... }
+#   }
+#
+# = ... And Reusing Them
+#
+# Groups of shared tests may also be nested inside +case+ blocks, where
+# they will inherit the namespace of their parent.  Since shared tests will
+# most commonly see reuse inside either the +case+ they're declared in or a
+# nested case, it's not usually necessary to specify the full package name.
+# The +reuse+ keyword will try, therefore, to infer the fully qualified
+# package name from the name it's given.  (You can always specify the full name
+# yourself by prepending '::'.)
+#
+#   shared CommonTests {
+#       # __PACKAGE__ is 'Nested::CommonTests'
+#   }
+#
+#   case Nested {
+#       shared CommonTests {
+#           # __PACKAGE__ is 'Nested::CommonTests'
+#       }
+#
+#       case Deeply {
+#           shared CommonTests {
+#               # __PACKAGE__ is 'Nested::Deeply::CommonTests'
+#           }
+#
+#           # includes Nested::Deeply::CommonTests
+#           reuse CommonTests;
+#
+#           # includes Nested::CommonTests
+#           reuse Nested::CommonTests;
+#
+#           # includes CommonTests
+#           reuse ::CommonTests;
+#       }
+#
+#       # includes Nested::CommonTests
+#       reuse CommonTests;
+#   }
+#
+# = Automatic +use+
+#
 # To automatically use packages inside all your test cases (for example, your
 # own custom assertions), simply pass the 'with' option to Test::Mini::Unit;
-# it can handle either a single package name or an array.
+# it can accept either a single package name or an array.
 #
 #   use Test::Mini::Unit (with => [ My::Assertions, My::HelperFuncs ]);
 #
@@ -116,6 +181,10 @@
 #       # My::Assertions and My::HelperFuncs are already imported here.
 #       case Nested {
 #           # In here, too.
+#       }
+#
+#       shared CommonTests {
+#           # Yup, here too.
 #       }
 #   }
 #

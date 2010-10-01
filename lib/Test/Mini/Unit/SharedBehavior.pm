@@ -1,3 +1,5 @@
+# Base class for packages declared by the 'shared' keyword.
+# @api private
 package Test::Mini::Unit::SharedBehavior;
 
 use Sub::Name;

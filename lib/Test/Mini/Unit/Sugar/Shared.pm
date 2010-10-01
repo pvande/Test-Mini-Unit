@@ -1,4 +1,4 @@
-# Defines the behavior of the +case+ keyword.
+# Defines the behavior of the +shared+ keyword.
 # @api private
 package Test::Mini::Unit::Sugar::Shared;
 use base 'Devel::Declare::Context::Simple';
