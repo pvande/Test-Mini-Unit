@@ -12,7 +12,7 @@ SKIP
 my %WriteMakefileArgs = (
     'NAME'       => 'Test::Mini::Unit',
     'ABSTRACT'   => 'Declarative Sugar for Test::Mini',
-    'VERSION'    => 'v0.0.0',
+    'VERSION'    => 'v1.0.0',
     'AUTHOR'     => 'Pieter van de Bruggen <pvande@cpan.org>',
     'LICENSE'    => 'perl',
     'META_MERGE' => {
