@@ -63,7 +63,9 @@ sub parser {
         'sub teardown { shift->SUPER::teardown(@_) }',
 
         "use ${Sugar}::TestCase $with;",
+        "use ${Sugar}::Shared $with;",
         "use ${Sugar}::Test;",
+        "use ${Sugar}::Reuse;",
         "use ${Sugar}::Advice (name => 'setup',    order => 'pre');",
         "use ${Sugar}::Advice (name => 'teardown', order => 'post');",
         (map { "use $_;" } reverse @with),
