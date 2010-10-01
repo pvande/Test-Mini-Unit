@@ -31,7 +31,7 @@ sub parser {
     my $name = $self->strip_name();
     $self->inject(qq'"$name"; ');
     my $fullname = $self->qualify_name($name);
-    $self->inject("use $fullname");
+    $self->inject("$fullname->import();");
 }
 
 sub qualify_name {
