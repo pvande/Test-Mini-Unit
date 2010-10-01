@@ -169,7 +169,7 @@
 #       reuse CommonTests;
 #   }
 #
-# = Automatic +use+
+# = Automatic 'use'
 #
 # To automatically use packages inside all your test cases (for example, your
 # own custom assertions), simply pass the 'with' option to Test::Mini::Unit;

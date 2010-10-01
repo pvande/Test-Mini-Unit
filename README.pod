@@ -178,7 +178,7 @@ given.  (You can always specify the full name yourself by prepending
       reuse CommonTests;
   }
 
-=head2 Automatic +use+
+=head2 Automatic 'use'
 
 To automatically use packages inside all your test cases (for example,
 your own custom assertions), simply pass the 'with' option to
