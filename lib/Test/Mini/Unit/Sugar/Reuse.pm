@@ -14,7 +14,12 @@ sub import {
 
     {
         no strict 'refs';
-        *{"$caller\::reuse"} = sub ($) {};
+        *{"$caller\::reuse"} = sub ($) {
+            my $caller = caller;
+            my $pkg = __PACKAGE__->qualify_name(shift, $caller);
+            unshift(@_, $pkg);
+            goto &{$pkg->can('import')};
+        };
     }
 
     Devel::Declare->setup_for(
@@ -29,22 +34,19 @@ sub parser {
     $self->skip_declarator();
 
     my $name = $self->strip_name();
-    $self->inject(qq'"$name"; ');
-    my $fullname = $self->qualify_name($name);
-    $self->inject("$fullname->import();");
+    $self->inject("'${name}'");
 }
 
 sub qualify_name {
-    my ($self, $name) = @_;
+    my ($self, $name, $mod) = @_;
     my $file;
-    my $mod = $self->get_curstash_name();
 
-    if ($name =~ s/^::// || $self->get_curstash_name() eq 'main') {
+    if ($name =~ s/^::// || $mod eq 'main') {
         ($file = $name) =~ s/::/\//g;
         die "Cannot find module '$name' to reuse..."
             unless exists $INC{"$file.pm"};
     } else {
-        my $pkg = $self->get_curstash_name();
+        my $pkg = $mod;
         my @pkg_parts  = split('::', $pkg);
         my @name_parts = split('::', $name);
 
@@ -57,32 +59,16 @@ sub qualify_name {
             $file = undef;
         }
 
-        die "Cannot resolve module '$name' relative to '$pkg'..." unless $file;
+        die <<ERROR unless $file;
+
+Cannot resolve module '$name' relative to '$pkg'...
+Remember that shared blocks must be declared before the call to `reuse`.
+ERROR
 
         ($name = $file) =~ s/\//::/g;
     }
 
     return $name;
-}
-
-sub rewrite_declarator {
-    my ($self, $name) = @_;
-
-    # Parse the length of the next word.
-    my $declarator = $self->declarator;
-    my $length = Devel::Declare::toke_scan_word($self->offset, 0);
-    confess "Couldn't find declarator '$declarator'" unless $length;
-
-    # Verify that the next word is what we expect it to be.
-    my $linestr = $self->get_linestr();
-    my $found = substr($linestr, $self->offset, $length);
-    confess "Expected declarator '${declarator}', got '${found}'"
-        unless $found eq $declarator;
-
-    # Replace the declarator with the given name.
-    substr($linestr, $self->offset, $length) = $name;
-    $self->set_linestr($linestr);
-    $self->inc_offset(length($name));
 }
 
 sub inject {

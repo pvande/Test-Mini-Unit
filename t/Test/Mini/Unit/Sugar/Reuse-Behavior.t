@@ -28,7 +28,7 @@ use Test::Mini::Unit;
     package Deeply::Nested::Package;
     use Test::Mini::Unit::Sugar::Reuse;
 
-    BEGIN { our @used = () }
+    our @used = ();
 
     reuse A;
     reuse Package::A;
@@ -57,7 +57,7 @@ use Test::Mini::Unit;
     package main;
     use Test::Mini::Unit::Sugar::Reuse;
 
-    BEGIN { our @used = () }
+    our @used = ();
     
     reuse Deeply::Nested::Package::A;
     reuse ::Deeply::Nested::Package::A;

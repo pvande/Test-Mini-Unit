@@ -49,7 +49,7 @@ sub parser {
         "package $name;",
         "use base '$base';",
 
-        "BEGIN { \$INC{'${file}.pm'} = __FILE__; }",
+        "\$INC{'${file}.pm'} = __FILE__;",
 
         "use Test::Mini::Assertions;",
 
