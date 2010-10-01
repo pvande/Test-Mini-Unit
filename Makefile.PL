@@ -23,13 +23,11 @@ my %WriteMakefileArgs = (
         },
     },
     'PREREQ_PM' => {
-        'Test::Mini'     => 'v1.0.0',
+        'Test::Mini'     => 'v1.1.0',
         'Devel::Declare' => 'v0.6.0',
         'Sub::Name'      => '0.05',
     },
-    'BUILD_REQUIRES' => {
-        'B'          => '0',
-    },
+    'BUILD_REQUIRES' => { },
     'CONFIGURE_REQUIRES' => {
          'ExtUtils::MakeMaker' => '6.31',
          'ExtUtils::Manifest'  => '1.56',
