@@ -42,6 +42,7 @@ sub parser {
     # Nested packages should be namespaced under their parent, unless the
     # package name is qualified or they're in the top level.
     $name = join('::', $pkg, $name) unless $name =~ s/^::// || $pkg eq 'main';
+    (my $file = $name) =~ s/::/\//g;
 
     my $Sugar = 'Test::Mini::Unit::Sugar';
     my @with = ref $self->{with} ? @{$self->{with}} : $self->{with} || ();
@@ -52,6 +53,9 @@ sub parser {
 
         "package $name;",
         "use base '$base';",
+
+        "BEGIN { \$INC{'${file}.pm'} = __FILE__; }",
+
         "use Test::Mini::Assertions;",
 
         # Provide explicit default advice to avoid some order-specific issues.
