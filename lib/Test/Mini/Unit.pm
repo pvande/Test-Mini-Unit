@@ -128,6 +128,7 @@ use 5.008;
 
 use Test::Mini;
 
+require Test::Mini::Unit::Sugar::Shared;
 require Test::Mini::Unit::Sugar::TestCase;
 
 sub import {
@@ -137,6 +138,7 @@ sub import {
     strict->import;
     warnings->import;
 
+    Test::Mini::Unit::Sugar::Shared->import(into => $caller, @args);
     Test::Mini::Unit::Sugar::TestCase->import(into => $caller, @args);
 }
 
