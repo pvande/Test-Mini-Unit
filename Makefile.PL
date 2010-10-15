@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
         },
     },
     'PREREQ_PM' => {
-        'Test::Mini'     => 'v1.1.0',
+        'Test::Mini'     => 'v1.1.1',
         'Devel::Declare' => 'v0.6.0',
         'Sub::Name'      => '0.05',
     },
