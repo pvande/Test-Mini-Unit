@@ -200,6 +200,7 @@ use Test::Mini;
 require Test::Mini::Unit::Sugar::Shared;
 require Test::Mini::Unit::Sugar::TestCase;
 
+# @api private
 sub import {
     my ($class, @args) = @_;
     my $caller = caller();

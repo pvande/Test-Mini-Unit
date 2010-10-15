@@ -212,18 +212,6 @@ L<<<< S<<<<< Test::Mini >>>>>|Test::Mini >>>>
 
 =back
 
-=head1 METHODS
-
-=head2 Class Methods
-
-=over
-
-=item B<<<< import >>>>
-
-    import($class, @args)
-
-=back
-
 =head1 AUTHOR
 
 Pieter van de Bruggen <pvande@cpan.org>
