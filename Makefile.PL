@@ -12,7 +12,7 @@ SKIP
 my %WriteMakefileArgs = (
     'NAME'       => 'Test::Mini::Unit',
     'ABSTRACT'   => 'Declarative Sugar for Test::Mini',
-    'VERSION'    => 'v1.0.1',
+    'VERSION'    => 'v1.0.2',
     'AUTHOR'     => 'Pieter van de Bruggen <pvande@cpan.org>',
     'LICENSE'    => 'perl',
     'META_MERGE' => {
@@ -23,7 +23,8 @@ my %WriteMakefileArgs = (
         },
     },
     'PREREQ_PM' => {
-        'Test::Mini'     => 'v1.1.1',
+        'version'        => '0.77',
+        'Test::Mini'     => 'v1.1.2',
         'Devel::Declare' => 'v0.6.0',
         'Sub::Name'      => '0.05',
     },
@@ -44,11 +45,15 @@ my %WriteMakefileArgs = (
     },
 );
 
-delete $WriteMakefileArgs{BUILD_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.56) };
+unless (eval { ExtUtils::MakeMaker->VERSION(6.56) }) {
+    my $REQS = delete $WriteMakefileArgs{BUILD_REQUIRES};
+    $WriteMakefileArgs{PREREQ_PM}->{$_} = $REQS->{$_} for keys %$REQS;
+}
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+unless (eval { ExtUtils::MakeMaker->VERSION(6.52) }) {
+    my $REQS = delete $WriteMakefileArgs{CONFIGURE_REQUIRES};
+    $WriteMakefileArgs{PREREQ_PM}->{$_} = $REQS->{$_} for keys %$REQS;
+}
 
 (my $DISTNAME = $WriteMakefileArgs{NAME}) =~ s/::/-/g;
 my $DISTDIR = "$DISTNAME-$WriteMakefileArgs{VERSION}";
