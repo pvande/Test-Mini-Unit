@@ -195,7 +195,7 @@ use strict;
 use warnings;
 use 5.008;
 
-use version 0.77; our $VERSION = qv("v1.0.2");
+use version 0.77; our $VERSION = qv("v1.0.3");
 
 use Test::Mini;
 
