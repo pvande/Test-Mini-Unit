@@ -23,7 +23,7 @@ case t::Test::Mini::Unit::Sugar::Shared::Behavior {
         assert_can('Qualified'    => $_) for qw/ setup teardown test assert /;
     }
     
-    test created_packages_ared_marked_as_loaded {
+    test created_packages_are_marked_as_loaded {
         assert_equal($INC{'Dummy/Tests.pm'}, __FILE__);
         assert_equal($INC{'Qualified.pm'},   __FILE__);
     }

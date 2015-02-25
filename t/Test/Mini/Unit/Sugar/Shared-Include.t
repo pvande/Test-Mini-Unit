@@ -34,7 +34,7 @@ use Test::Mini::Unit;
 case t::Test::Mini::Unit::Sugar::Shared::Include {
     setup { @calls = () }
 
-    test packge_now_contains_shared_test_methods {
+    test package_now_contains_shared_test_methods {
         assert_can('TestPackage' => 'test_something');
     }
 
